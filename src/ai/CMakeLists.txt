@@ -68,6 +68,7 @@ set (SOURCES
     manager/plan_veschambres.cpp
     # manager/Match.cpp
     manager/Manual.cpp
+    # manager/RPC_Manager.cpp
     manager/factory.cpp
     strategy/Strategy.cpp
     strategy/halt.cpp
@@ -95,6 +96,7 @@ set (SOURCES
     strategy/goalie_strat.cpp
     strategy/prepare_kickoff.cpp
     strategy/example.cpp
+    strategy/RPC_Strat.cpp
     control/robot_control.cpp
     control/robot_control_with_curve.cpp
     control/robot_control_with_position_following.cpp

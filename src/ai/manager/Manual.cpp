@@ -23,6 +23,7 @@
 #include <strategy/halt.h>
 #include <strategy/tare_and_synchronize.h>
 #include <strategy/from_robot_behavior.h>
+#include <strategy/RPC_Strat.h>
 #include <robot_behavior/goalie.h>
 #include <robot_behavior/example.h>
 #include <robot_behavior/example_machine_state.h>
@@ -619,6 +620,18 @@ Manual::Manual( Ai::AiData & ai_data ):
             new Strategy::Tare_and_synchronize(ai_data)
         )
     );
+
+
+    register_strategy(
+        Strategy::HighFive::name,
+        std::shared_ptr<Strategy::Strategy>(
+            new Strategy::HighFive(ai_data)
+        )
+    );
+
+
+
+
     assign_strategy(
         Strategy::Halt::name, 0.0,
         get_team_ids()
