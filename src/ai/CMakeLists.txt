@@ -60,6 +60,7 @@ set (SOURCES
     robot_behavior/wait_pass.cpp
     robot_behavior/slow_striker.cpp
     robot_behavior/test_infra.cpp
+    robot_behavior/go_to_xy.cpp
     Ai.cpp
     AiData.cpp
     debug.cpp
@@ -68,7 +69,7 @@ set (SOURCES
     manager/plan_veschambres.cpp
     # manager/Match.cpp
     manager/Manual.cpp
-    # manager/RPC_Manager.cpp
+    manager/RPC_Manager.cpp
     manager/factory.cpp
     strategy/Strategy.cpp
     strategy/halt.cpp

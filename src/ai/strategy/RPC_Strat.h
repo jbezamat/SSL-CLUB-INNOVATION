@@ -1,7 +1,7 @@
 /*
     This file is part of SSL.
 
-    Copyright 2018 Bezamat Jérémy (jeremy.bezamat@gmail.com)
+    Copyright 2018 ROMAINPC (romainpc.lechat@laposte.net)
 
     SSL is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "Strategy.h"
 #include <robot_behavior/position_follower.h>
-
+#include <robot_behavior/go_to_xy.h>
 
 namespace RhobanSSL {
 namespace Strategy {
@@ -31,7 +31,7 @@ class HighFive : public Strategy {
     private:
     bool behaviors_are_assigned;
     std::shared_ptr<Robot_behavior::PositionFollower> position_follower;
-    
+    std::shared_ptr<Robot_behavior::GoToXY> go_to_xy;
 
     public:
     HighFive(Ai::AiData & ai_data);

@@ -23,6 +23,7 @@
 #include <strategy/halt.h>
 #include <strategy/tare_and_synchronize.h>
 #include <strategy/from_robot_behavior.h>
+#include <strategy/defensive_2.h>
 #include <strategy/RPC_Strat.h>
 #include <robot_behavior/goalie.h>
 #include <robot_behavior/example.h>
@@ -42,6 +43,7 @@
 #include <robot_behavior/pass_dribbler.h>
 #include <robot_behavior/wait_pass.h>
 #include <robot_behavior/pass.h>
+#include <robot_behavior/go_to_xy.h>
 
 namespace RhobanSSL {
 namespace Manager {
@@ -610,6 +612,17 @@ Manual::Manual( Ai::AiData & ai_data ):
         )
     );
     register_strategy(
+        "goToXY", std::shared_ptr<Strategy::Strategy>(
+            new Strategy::From_robot_behavior(
+                ai_data,
+                [&](double time, double dt){
+                    Robot_behavior::GoToXY* p = new Robot_behavior::GoToXY(ai_data);
+                    return std::shared_ptr<Robot_behavior::RobotBehavior>(p);
+                }, false
+            )
+        )
+    );
+    register_strategy(
         Strategy::Halt::name, std::shared_ptr<Strategy::Strategy>(
             new Strategy::Halt(ai_data)
         )
@@ -620,6 +633,15 @@ Manual::Manual( Ai::AiData & ai_data ):
             new Strategy::Tare_and_synchronize(ai_data)
         )
     );
+
+
+    register_strategy(
+        Strategy::Defensive2::name,
+        std::shared_ptr<Strategy::Strategy>(
+            new Strategy::Defensive2(ai_data)
+        )
+    );
+
 
 
     register_strategy(

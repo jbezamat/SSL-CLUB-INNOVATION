@@ -19,12 +19,16 @@
 
 #include "RPC_Strat.h"
 #include <robot_behavior/position_follower.h>
+#include <robot_behavior/go_to_xy.h>
 
 namespace RhobanSSL {
 namespace Strategy {
 
 HighFive::HighFive(Ai::AiData & ai_data):
-	Strategy(ai_data)
+	Strategy(ai_data),
+      go_to_xy(std::shared_ptr<Robot_behavior::GoToXY>(
+        new Robot_behavior::GoToXY(ai_data)
+      ))
 {
 }
 
@@ -71,13 +75,8 @@ void HighFive::assign_behavior_to_robots(
   double time, double dt
 ){
   //we assign now all the other behavior
-  assert( get_player_ids().size() == 5 );
-  DEBUG(get_player_ids().size());
+  	assert( get_player_ids().size() == 5 );
   
-  	int robotID[get_player_ids().size()];
-  	for (unsigned int loop = 0 ; loop < get_player_ids().size() ; loop++){
-		robotID[loop] = player_id(loop);
-	}
 
 	/*
 	*					1				2	
@@ -90,13 +89,19 @@ void HighFive::assign_behavior_to_robots(
 
 
 	//cas par défaut:
-
+	DEBUG("ok--------------------------------------------");
+/*
 	Robot_behavior::PositionFollower* follower = new Robot_behavior::PositionFollower(ai_data, time, dt);
             follower->set_following_position(
                 ball_position(),
                 0
-            );
-	assign_behavior (robotID[3], position_follower);
+            );*/
+	//Robot_behavior::GoToXY* go_to_xy = new Robot_behavior::GoToXY(ai_data, time, dt);	
+	assign_behavior (player_id(0), go_to_xy);
+	assign_behavior (player_id(1), go_to_xy);
+	assign_behavior (player_id(2), go_to_xy);
+	assign_behavior (player_id(3), go_to_xy);
+	assign_behavior (player_id(4), go_to_xy);
 
 
 

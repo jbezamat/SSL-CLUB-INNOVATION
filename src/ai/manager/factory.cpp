@@ -22,6 +22,7 @@
 #include "Manual.h"
 // #include "Match.h"
 #include "plan_veschambres.h"
+#include "RPC_Manager.h"
 
 namespace RhobanSSL {
 namespace Manager {
@@ -30,6 +31,7 @@ std::list<std::string> Factory::list_of_avalaible_managers ={
     names::manual,
     // names::match,
     names::plan_veschambres,
+    names::rpc_manager
 };
 
 const std::list<std::string> & Factory::avalaible_managers(){
@@ -71,6 +73,11 @@ std::shared_ptr<Manager> Factory::construct_manager(
     if( manager_name == names::plan_veschambres ){
         manager = std::shared_ptr<Manager>(
             new PlanVeschambres(ai_data, game_state)
+        );
+    }
+    if( manager_name == names::rpc_manager ){
+        manager = std::shared_ptr<Manager>(
+            new RPCManager(ai_data, game_state)
         );
     }
     return manager;
