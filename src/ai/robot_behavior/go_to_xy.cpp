@@ -29,8 +29,10 @@ GoToXY::GoToXY(
     Ai::AiData & ai_data
 ):
     RobotBehavior(ai_data),
-    follower( Factory::fixed_consign_follower(ai_data) )
-{
+    follower( Factory::fixed_consign_follower(ai_data) ),
+    x(0),
+    y(0)
+    {
 }
 
 void GoToXY::update(
@@ -53,7 +55,7 @@ void GoToXY::update(
     Vector2d direction = ball_position() - robot_position;
     ContinuousAngle target_rotation = vector2angle( direction );
 
-    rhoban_geometry::Point target = rhoban_geometry::Point(0,0);
+    rhoban_geometry::Point target = rhoban_geometry::Point(x,y);
     
     follower->set_following_position( target, target_rotation );
 
@@ -68,9 +70,20 @@ Control GoToXY::control() const {
     return ctrl; 
 }
 
+void GoToXY::setX( int val ){
+    x = val;
+}
+void GoToXY::setY( int val ){
+    y = val;
+}
+
+
 GoToXY::~GoToXY(){
     delete follower;
 }
+
+
+
 
 RhobanSSLAnnotation::Annotations GoToXY::get_annotations() const {
     RhobanSSLAnnotation::Annotations annotations;

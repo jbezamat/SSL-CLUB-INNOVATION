@@ -31,7 +31,7 @@ class HighFive : public Strategy {
     private:
     bool behaviors_are_assigned;
     std::shared_ptr<Robot_behavior::PositionFollower> position_follower;
-    std::shared_ptr<Robot_behavior::GoToXY> go_to_xy;
+    std::shared_ptr<Robot_behavior::GoToXY> go_to_xy[5];
 
     public:
     HighFive(Ai::AiData & ai_data);

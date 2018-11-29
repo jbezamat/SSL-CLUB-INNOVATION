@@ -29,8 +29,11 @@ namespace Robot_behavior {
 
 class GoToXY : public RobotBehavior  {
     private:
+
 	ConsignFollower* follower;
     RhobanSSLAnnotation::Annotations annotations;
+    int x;
+    int y;
 
 
     public:
@@ -41,6 +44,8 @@ class GoToXY : public RobotBehavior  {
         const Ai::Robot & robot,
         const Ai::Ball & ball
     );
+    void setX(int val);
+    void setY(int val);
 
 	virtual Control control() const;
 
