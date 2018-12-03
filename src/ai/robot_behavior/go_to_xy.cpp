@@ -70,10 +70,10 @@ Control GoToXY::control() const {
     return ctrl; 
 }
 
-void GoToXY::setX( int val ){
+void GoToXY::setX( double val ){
     x = val;
 }
-void GoToXY::setY( int val ){
+void GoToXY::setY( double val ){
     y = val;
 }
 

@@ -32,8 +32,8 @@ class GoToXY : public RobotBehavior  {
 
 	ConsignFollower* follower;
     RhobanSSLAnnotation::Annotations annotations;
-    int x;
-    int y;
+    double x;
+    double y;
 
 
     public:
@@ -44,8 +44,8 @@ class GoToXY : public RobotBehavior  {
         const Ai::Robot & robot,
         const Ai::Ball & ball
     );
-    void setX(int val);
-    void setY(int val);
+    void setX(double val);
+    void setY(double val);
 
 	virtual Control control() const;
 

@@ -85,48 +85,77 @@ void HighFive::assign_behavior_to_robots(
   
 
 	/*
-	*					1				2	
+	*					5				2	
 	*
 	*  0						3
 	* goal
-	*					4				5
+	*					4				1
+	*/
+	/*NB : taille terrain division B: 9 * 6 mètres 
+	*
+	* coordonnées : (0,0) -> centre terrain
+	*				unité: mètre
+	*				Y-down
+	*				X-left quand on est à droite du terrain
+	*
+	*
 	*/
 
+	bool followBallMode = false; //if this mode not activated, then the Five has a constant height, he just follow BallX
+	
+	double ballX = ball_position().x;
+	double d = 0;
+	if(followBallMode)
+		d = 1;
+	else
+		d = 2;
+
+	//0 -> attanquant droit
+	//1 -> attanquant gauche
+	//2 -> milieu
+	//3 -> defenseur droit
+	//4 -> defenseur gauche
 
 
-	//placement  par défaut:
-	int d = 1;
-	go_to_xy[0] -> setX(d);
-	go_to_xy[0] -> setY(d);
-	assign_behavior (player_id(0), go_to_xy[0]);
-	go_to_xy[1] -> setX(0);
-	go_to_xy[1] -> setY(0);
-	assign_behavior (player_id(1), go_to_xy[1]);
-	go_to_xy[3] -> setX(-d);
-	go_to_xy[3] -> setY(-d);
-	assign_behavior (player_id(2), go_to_xy[3]);
-	go_to_xy[2] -> setX(-d);
-	go_to_xy[2] -> setY(d);
-	assign_behavior (player_id(3), go_to_xy[2]);
-	go_to_xy[4] -> setX(d);
-	go_to_xy[4] -> setY(-d);
-	assign_behavior (player_id(4), go_to_xy[4]);
+	//placement  quand pas d'action spécifique:
+	if(!followBallMode){
+		
+		double translation = ballX;
+		double limit = 3.7d;
+		
+		go_to_xy[0] -> setX(d + translation > limit ? limit : d + translation);
+		go_to_xy[0] -> setY(-d);
+		assign_behavior (player_id(0), go_to_xy[0]);
+
+		go_to_xy[1] -> setX(d + translation > limit ? limit : d + translation);
+		go_to_xy[1] -> setY(d);
+		assign_behavior (player_id(1), go_to_xy[1]);
+
+		go_to_xy[2] -> setX(0 + ballX);
+		go_to_xy[2] -> setY(0);
+		assign_behavior (player_id(2), go_to_xy[2]);
+
+		go_to_xy[3] -> setX(-d + translation < -limit ? -limit : -d + translation);
+		go_to_xy[3] -> setY(-d);
+		assign_behavior (player_id(3), go_to_xy[3]);
+
+		go_to_xy[4] -> setX(-d + translation < -limit ? -limit : -d + translation);
+		go_to_xy[4] -> setY(d);
+		assign_behavior (player_id(4), go_to_xy[4]);
 
 
 
-	/*
-  int nearest_ballID = get_nearest_ball(Vision::Team::Ally);
+	} else{
 
-  int id_to_obstruct = id_threat_max( Vision::Team::Opponent );
-  obstructeur->declare_robot_to_obstruct(id_to_obstruct, Vision::Team::Opponent);
-  if ( nearest_ballID == robotID ) {
-	assign_behavior( robotID, degageur );
-  }
-  else{
-	assign_behavior( robotID, obstructeur );
-  }
 
-  behaviors_are_assigned = true;*/
+
+
+
+
+	}
+
+
+	
 }
 
 // We declare here the starting positions that are used to :
