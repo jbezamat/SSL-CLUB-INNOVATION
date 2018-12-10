@@ -101,12 +101,13 @@ void HighFive::assign_behavior_to_robots(
 	*
 	*/
 
-	bool followBallMode = false; //if this mode not activated, then the Five has a constant height, he just follow BallX
+	bool followBallMode = true; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
 	
 	double ballX = ball_position().x;
+	double ballY = ball_position().y;
 	double d = 0;
 	if(followBallMode)
-		d = 1;
+		d = 1.5d;
 	else
 		d = 2;
 
@@ -145,11 +146,33 @@ void HighFive::assign_behavior_to_robots(
 
 
 
-	} else{
+	} else {
+		double xLimit = 4.3d;
+		double yLimit = 2.8d;
+		
+		rhoban_geometry::Point P0 = polarFromOriginToXY(ballX, ballY, +135, d);
+		go_to_xy[0] -> setX(P0.x > xLimit ? xLimit : P0.x);
+		go_to_xy[0] -> setY(P0.y < - yLimit ? -yLimit : P0.y);
+		assign_behavior (player_id(0), go_to_xy[0]);
 
+		rhoban_geometry::Point P1 = polarFromOriginToXY(ballX, ballY, -135, d);
+		go_to_xy[1] -> setX(P1.x > xLimit ? xLimit : P1.x);
+		go_to_xy[1] -> setY(P1.y > yLimit ? yLimit : P1.y);
+		assign_behavior (player_id(1), go_to_xy[1]);
 
+		go_to_xy[2] -> setX(ballX);
+		go_to_xy[2] -> setY(ballY);
+		assign_behavior (player_id(2), go_to_xy[2]);
 
+		rhoban_geometry::Point P3 = polarFromOriginToXY(ballX, ballY, 45, d);
+		go_to_xy[3] -> setX(P3.x < -xLimit ? -xLimit : P3.x);
+		go_to_xy[3] -> setY(P3.y < - yLimit ? -yLimit : P3.y);
+		assign_behavior (player_id(3), go_to_xy[3]);
 
+		rhoban_geometry::Point P4 = polarFromOriginToXY(ballX, ballY, -45, d);
+		go_to_xy[4] -> setX(P4.x < -xLimit ? -xLimit : P4.x);
+		go_to_xy[4] -> setY(P4.y > yLimit ? yLimit : P4.y);
+		assign_behavior (player_id(4), go_to_xy[4]);
 
 
 	}

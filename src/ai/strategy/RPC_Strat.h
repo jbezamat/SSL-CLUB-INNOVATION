@@ -23,6 +23,7 @@
 #include "Strategy.h"
 #include <robot_behavior/position_follower.h>
 #include <robot_behavior/go_to_xy.h>
+#include "game_informations.h"
 
 namespace RhobanSSL {
 namespace Strategy {
