@@ -424,4 +424,29 @@ bool GameInformations::infra_red( int robot_id, Vision::Team team ) const{
     return get_robot( robot_id, team ).infra_red;
 }
 
+
+    /* that function give a point (so x and y) at a angle and a distance from origin.
+    * angle in degrees
+    */
+
+rhoban_geometry::Point GameInformations::polarFromOriginToXY(double originX, double originY, double angle, double dist){
+    rhoban_geometry::Point result = rhoban_geometry::Point(0,0);
+
+    angle = to_radians(angle);
+
+    double x = originX - cos(angle) * dist;
+    double y = originY - sin(angle) * dist;
+    result.x = x;
+    result.y = y;
+
+    return result;
+}
+
+//function for convert degrees to radian:
+double GameInformations::to_radians(double degrees) {
+    return degrees * M_PI / 180.0;
+}
+
+
+
 };

@@ -91,6 +91,9 @@ class GameInformations {
     Box ally_penalty_area() const;
     Box opponent_penalty_area() const;
 
+
+    rhoban_geometry::Point polarFromOriginToXY(double originX, double originY, double angle, double dist);
+    double to_radians(double degrees);
 };
 
 
