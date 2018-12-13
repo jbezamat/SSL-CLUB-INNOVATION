@@ -18,6 +18,9 @@
 */
 
 #include "RPC_Strat.h"
+
+#include <AiData.h>
+
 #include <robot_behavior/position_follower.h>
 #include <robot_behavior/go_to_xy.h>
 
@@ -34,7 +37,15 @@ HighFive::HighFive(Ai::AiData & ai_data):
         new Robot_behavior::GoToXY(ai_data)
       );
 	}
+
+	for(size_t i = 0; i < 5; i++)
+	{
+		striker[i] = std::shared_ptr<Robot_behavior::Striker>(
+        new Robot_behavior::Striker(ai_data)
+      );
 	}
+
+}
 	
 	 
 
@@ -101,15 +112,24 @@ void HighFive::assign_behavior_to_robots(
 	*
 	*/
 
-	bool followBallMode = true; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
-	
-	double ballX = ball_position().x;
-	double ballY = ball_position().y;
-	double d = 0;
-	if(followBallMode)
-		d = 1.5d;
-	else
-		d = 2;
+	/*
+	*ATTAQUE :
+	* le milieu à un couloir de 1/3 de la hauteur, chaque ailier aussi.
+	* En gros si le tir est possible => striker dès qu'on atteint a balle 
+	* Sinon les aliers font la passe au milieu et le milieu au ailers
+	*
+	*
+	*
+	*
+	*
+	*
+	*
+	*
+	*
+	*
+	*
+	*/
+
 
 	//0 -> attanquant droit
 	//1 -> attanquant gauche
@@ -118,7 +138,27 @@ void HighFive::assign_behavior_to_robots(
 	//4 -> defenseur gauche
 
 
-	//placement  quand pas d'action spécifique:
+	bool followBallMode = true; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
+	
+
+	//settings
+	double ballX = ball_position().x;
+	double ballY = ball_position().y;
+	double d = 0;
+	if(followBallMode)
+		d = 1.5d;
+	else
+		d = 2;
+
+	//boite d'approche:
+		Box zoneApproche = Box(
+                     {ballX - 0.10, ballY - 0.10},
+                     {ballX + 0.10, ballY + 0.10});
+
+	
+
+
+	//#######   placement par défaut:   #####################################################################
 	if(!followBallMode){
 		
 		double translation = ballX;
@@ -159,10 +199,12 @@ void HighFive::assign_behavior_to_robots(
 		go_to_xy[1] -> setX(P1.x > xLimit ? xLimit : P1.x);
 		go_to_xy[1] -> setY(P1.y > yLimit ? yLimit : P1.y);
 		assign_behavior (player_id(1), go_to_xy[1]);
+		
 
 		go_to_xy[2] -> setX(ballX);
 		go_to_xy[2] -> setY(ballY);
 		assign_behavior (player_id(2), go_to_xy[2]);
+	
 
 		rhoban_geometry::Point P3 = polarFromOriginToXY(ballX, ballY, 45, d);
 		go_to_xy[3] -> setX(P3.x < -xLimit ? -xLimit : P3.x);
@@ -177,6 +219,23 @@ void HighFive::assign_behavior_to_robots(
 
 	}
 
+	//#######   comportement offensif   #####################################################################
+
+		//millieu:
+		double x = get_robot(player_id(2)).get_movement().linear_position( time ).x;
+		double y = get_robot(player_id(2)).get_movement().linear_position( time ).y;
+		double distApproche = 0.2d;
+		
+		if(ballX > 1){
+			//if(abs(ballX - x) < distApproche && abs(ballY - y) < distApproche){
+			if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
+				assign_behavior (player_id(2), striker[2]);
+			}
+		}
+
+
+
+	//#######   comportement défensif   #####################################################################
 
 	
 }
