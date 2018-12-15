@@ -146,14 +146,14 @@ void HighFive::assign_behavior_to_robots(
 	double ballY = ball_position().y;
 	double d = 0;
 	if(followBallMode)
-		d = 1.5d;
+		d = 2.5;
 	else
 		d = 2;
 
 	//boite d'approche:
 		Box zoneApproche = Box(
-                     {ballX - 0.10, ballY - 0.10},
-                     {ballX + 0.10, ballY + 0.10});
+                     {ballX - 0.80, ballY - 0.80},
+                     {ballX + 0.80, ballY + 0.80});
 
 	
 
@@ -222,12 +222,8 @@ void HighFive::assign_behavior_to_robots(
 	//#######   comportement offensif   #####################################################################
 
 		//millieu:
-		double x = get_robot(player_id(2)).get_movement().linear_position( time ).x;
-		double y = get_robot(player_id(2)).get_movement().linear_position( time ).y;
-		double distApproche = 0.2d;
 		
 		if(ballX > 1){
-			//if(abs(ballX - x) < distApproche && abs(ballY - y) < distApproche){
 			if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
 				assign_behavior (player_id(2), striker[2]);
 			}
@@ -239,6 +235,10 @@ void HighFive::assign_behavior_to_robots(
 
 	
 }
+
+
+
+
 
 // We declare here the starting positions that are used to :
 //   - place the robot during STOP referee state
