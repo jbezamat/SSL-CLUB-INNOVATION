@@ -30,7 +30,7 @@ namespace Strategy {
 HighFive::HighFive(Ai::AiData & ai_data):
 	Strategy(ai_data)
 {
-	
+
 	for(size_t i = 0; i < 5; i++)
 	{
 		go_to_xy[i] = std::shared_ptr<Robot_behavior::GoToXY>(
@@ -162,7 +162,7 @@ void HighFive::assign_behavior_to_robots(
 	if(!followBallMode){
 		
 		double translation = ballX;
-		double limit = 3.7d;
+		double limit = 3.7;
 		
 		go_to_xy[0] -> setX(d + translation > limit ? limit : d + translation);
 		go_to_xy[0] -> setY(-d);
@@ -222,12 +222,57 @@ void HighFive::assign_behavior_to_robots(
 	//#######   comportement offensif   #####################################################################
 
 		//millieu:
-		
+		double y = get_robot(player_id(2)).get_movement().linear_position( time ).y;
+		//condition d'attaque:
 		if(ballX > 1){
-			if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
-				assign_behavior (player_id(2), striker[2]);
+			
+			//condition de zone: (bandeau 1/3)
+			if( y <= 1 && y >= -1){
+				//condition d'approche:
+				if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
+					//cas de tir:
+					assign_behavior (player_id(2), striker[2]);
+				}
 			}
+
 		}
+
+
+		//attaquant droit:
+		y = get_robot(player_id(0)).get_movement().linear_position( time ).y;
+
+		//condition d'attaque:
+		if(ballX > 1){
+			
+			//condition de zone: (bandeau 1/3)
+			if( y < -1){
+				//condition d'approche:
+				if(zoneApproche.is_inside(get_robot(player_id(0)).get_movement().linear_position( time ))){
+					//cas de tir:
+					assign_behavior (player_id(0), striker[0]);
+				}
+			}
+
+		}
+
+		//attaquant gauche:
+		y = get_robot(player_id(1)).get_movement().linear_position( time ).y;
+
+		//condition d'attaque:
+		if(ballX > 1){
+			
+			//condition de zone: (bandeau 1/3)
+			if( y > 1){
+				//condition d'approche:
+				if(zoneApproche.is_inside(get_robot(player_id(1)).get_movement().linear_position( time ))){
+					//cas de tir:
+					assign_behavior (player_id(1), striker[1]);
+				}
+			}
+
+		}
+
+
 
 
 
