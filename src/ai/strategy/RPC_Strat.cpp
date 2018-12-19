@@ -33,17 +33,15 @@ HighFive::HighFive(Ai::AiData & ai_data):
 
 	for(size_t i = 0; i < 5; i++)
 	{
-		go_to_xy[i] = std::shared_ptr<Robot_behavior::GoToXY>(
+	  go_to_xy[i] = std::shared_ptr<Robot_behavior::GoToXY>(
         new Robot_behavior::GoToXY(ai_data)
       );
-	}
-
-	for(size_t i = 0; i < 5; i++)
-	{
-		striker[i] = std::shared_ptr<Robot_behavior::Striker>(
+	  striker[i] = std::shared_ptr<Robot_behavior::Striker>(
         new Robot_behavior::Striker(ai_data)
       );
 	}
+
+
 
 }
 	
@@ -150,13 +148,12 @@ void HighFive::assign_behavior_to_robots(
 	else
 		d = 2;
 
-	//boite d'approche:
-		Box zoneApproche = Box(
-                     {ballX - 0.80, ballY - 0.80},
+	Box zoneApproche = Box(
+                    {ballX - 0.80, ballY - 0.80},
                      {ballX + 0.80, ballY + 0.80});
 
-	
-
+	double seuilBandeau = 0.4;
+	Vision::Team ennemis = Vision::Team::Opponent;
 
 	//#######   placement par défaut:   #####################################################################
 	if(!followBallMode){
@@ -219,10 +216,18 @@ void HighFive::assign_behavior_to_robots(
 
 	}
 
+
+
+	rhoban_geometry::Point coordM = get_robot(player_id(2)).get_movement().linear_position( time );
+	rhoban_geometry::Point coordAD = get_robot(player_id(0)).get_movement().linear_position( time );
+	rhoban_geometry::Point coordAG = get_robot(player_id(1)).get_movement().linear_position( time );
+
+
+
 	//#######   comportement offensif   #####################################################################
 
-		//millieu:
-		double y = get_robot(player_id(2)).get_movement().linear_position( time ).y;
+		//=====>   millieu:
+		double y = coordM.y;
 		//condition d'attaque:
 		if(ballX > 1){
 			
@@ -230,16 +235,32 @@ void HighFive::assign_behavior_to_robots(
 			if( y <= 1 && y >= -1){
 				//condition d'approche:
 				if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
-					//cas de tir:
+					
+					std::vector<int> bandeauBut = get_robot_in_line(coordM,oponent_goal_center(),ennemis,seuilBandeau);
+					std::vector<int> bandeauAD = get_robot_in_line(coordM,coordAD,ennemis,seuilBandeau);
+					std::vector<int> bandeauAG = get_robot_in_line(coordM,coordAG,ennemis,seuilBandeau);
+					
+					//choix de tir ou de passe à l'ailier:
+					if(bandeauBut.size() <= bandeauAD.size() && bandeauBut.size() <= bandeauAG.size()){
+						//cas de tir:
+						striker[2] ->  declare_point_to_strik(oponent_goal_center());
+					}else{
+						//cas de passe:
+						if(bandeauAG.size() < bandeauAD.size())
+							striker[2] ->  declare_point_to_strik(coordAG);
+						else
+							striker[2] ->  declare_point_to_strik(coordAD);
+					}
 					assign_behavior (player_id(2), striker[2]);
+
 				}
 			}
 
 		}
 
 
-		//attaquant droit:
-		y = get_robot(player_id(0)).get_movement().linear_position( time ).y;
+		//=====>   attaquant droit:
+		y = coordAD.y;
 
 		//condition d'attaque:
 		if(ballX > 1){
@@ -248,15 +269,25 @@ void HighFive::assign_behavior_to_robots(
 			if( y < -1){
 				//condition d'approche:
 				if(zoneApproche.is_inside(get_robot(player_id(0)).get_movement().linear_position( time ))){
-					//cas de tir:
+					std::vector<int> bandeauBut = get_robot_in_line(coordAD,oponent_goal_center(),ennemis,seuilBandeau);
+					std::vector<int> bandeauM = get_robot_in_line(coordAD,coordM,ennemis,seuilBandeau);
+
+					//choix de tir ou de passe au milieu:
+					if(bandeauBut.size() <= bandeauM.size()){
+						//cas de tir:
+						striker[0] ->  declare_point_to_strik(oponent_goal_center());
+					}else{
+						//cas de passe:
+						striker[0] ->  declare_point_to_strik(coordM);
+					}
 					assign_behavior (player_id(0), striker[0]);
 				}
 			}
 
 		}
 
-		//attaquant gauche:
-		y = get_robot(player_id(1)).get_movement().linear_position( time ).y;
+		//=====>   attaquant gauche:
+		y = coordAG.y;
 
 		//condition d'attaque:
 		if(ballX > 1){
@@ -265,16 +296,24 @@ void HighFive::assign_behavior_to_robots(
 			if( y > 1){
 				//condition d'approche:
 				if(zoneApproche.is_inside(get_robot(player_id(1)).get_movement().linear_position( time ))){
-					//cas de tir:
+					std::vector<int> bandeauBut = get_robot_in_line(coordAG,oponent_goal_center(),ennemis,seuilBandeau);
+					std::vector<int> bandeauM = get_robot_in_line(coordAG,coordM,ennemis,seuilBandeau);
+
+					//choix de tir ou de passe au milieu:
+					if(bandeauBut.size() <= bandeauM.size()){
+						//cas de tir:
+						striker[1] ->  declare_point_to_strik(oponent_goal_center());
+					}else{
+						//cas de passe
+						striker[1] ->  declare_point_to_strik(coordM);
+					}
 					assign_behavior (player_id(1), striker[1]);
 				}
 			}
 
 		}
 
-
-
-
+		
 
 	//#######   comportement défensif   #####################################################################
 
