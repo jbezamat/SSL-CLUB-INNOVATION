@@ -49,7 +49,7 @@ namespace RhobanSSL {
 
 			std::vector< std::list<std::string> > rpc_strats;
 			
-			bool ball_was_in_ally_part = true;
+			bool ball_was_in_offensive_zone = true;
 
 			std::list<std::string> future_strats;
 
