@@ -448,5 +448,13 @@ double GameInformations::to_radians(double degrees) {
 }
 
 
+double GameInformations::distBetween(rhoban_geometry::Point p1, rhoban_geometry::Point p2){
+
+    return sqrt( (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) );
+
+
+}
+
+
 
 };

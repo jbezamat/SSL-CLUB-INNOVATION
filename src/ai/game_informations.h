@@ -94,6 +94,7 @@ class GameInformations {
 
     rhoban_geometry::Point polarFromOriginToXY(double originX, double originY, double angle, double dist);
     double to_radians(double degrees);
+    double distBetween(rhoban_geometry::Point p1, rhoban_geometry::Point p2);
 };
 
 

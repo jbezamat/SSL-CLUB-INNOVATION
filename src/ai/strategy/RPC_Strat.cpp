@@ -136,7 +136,7 @@ void HighFive::assign_behavior_to_robots(
 	//4 -> defenseur gauche
 
 
-	bool followBallMode = true; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
+	bool followBallMode = false; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
 	
 
 	//settings
@@ -148,9 +148,11 @@ void HighFive::assign_behavior_to_robots(
 	else
 		d = 2;
 
+	double cote = 1.20;//0.80;
 	Box zoneApproche = Box(
-                    {ballX - 0.80, ballY - 0.80},
-                     {ballX + 0.80, ballY + 0.80});
+                    {ballX - cote, ballY - cote},
+                     {ballX + cote, ballY + cote});
+	double seuilApproche = 1.50;
 
 	double seuilBandeau = 0.4;
 	Vision::Team ennemis = Vision::Team::Opponent;
@@ -225,7 +227,7 @@ void HighFive::assign_behavior_to_robots(
 
 
 	//#######   comportement offensif   #####################################################################
-
+		
 		//=====>   millieu:
 		double y = coordM.y;
 		//condition d'attaque:
@@ -234,7 +236,8 @@ void HighFive::assign_behavior_to_robots(
 			//condition de zone: (bandeau 1/3)
 			if( y <= 1 && y >= -1){
 				//condition d'approche:
-				if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
+				//if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
+				if(distBetween(coordM, ball_position()) <= seuilApproche){
 					
 					std::vector<int> bandeauBut = get_robot_in_line(coordM,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauAD = get_robot_in_line(coordM,coordAD,ennemis,seuilBandeau);
@@ -268,7 +271,9 @@ void HighFive::assign_behavior_to_robots(
 			//condition de zone: (bandeau 1/3)
 			if( y < -1){
 				//condition d'approche:
-				if(zoneApproche.is_inside(get_robot(player_id(0)).get_movement().linear_position( time ))){
+				//if(zoneApproche.is_inside(get_robot(player_id(0)).get_movement().linear_position( time ))){
+				
+				if(distBetween(coordAD, ball_position()) <= seuilApproche){
 					std::vector<int> bandeauBut = get_robot_in_line(coordAD,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauM = get_robot_in_line(coordAD,coordM,ennemis,seuilBandeau);
 
@@ -295,7 +300,8 @@ void HighFive::assign_behavior_to_robots(
 			//condition de zone: (bandeau 1/3)
 			if( y > 1){
 				//condition d'approche:
-				if(zoneApproche.is_inside(get_robot(player_id(1)).get_movement().linear_position( time ))){
+				//if(zoneApproche.is_inside(get_robot(player_id(1)).get_movement().linear_position( time ))){
+				if(distBetween(coordAG, ball_position()) <= seuilApproche){
 					std::vector<int> bandeauBut = get_robot_in_line(coordAG,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauM = get_robot_in_line(coordAG,coordM,ennemis,seuilBandeau);
 
