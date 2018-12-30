@@ -112,9 +112,9 @@ void HighFive::assign_behavior_to_robots(
 
 	/*
 	*ATTAQUE :
-	* le milieu à un couloir de 1/3 de la hauteur, chaque ailier aussi.
+	* le milieu à un couloir de 1/3 de la hauteur(+marges de 25% de chaque côté), chaque ailier aussi.
 	* En gros si le tir est possible => striker dès qu'on atteint a balle 
-	* Sinon les aliers font la passe au milieu et le milieu au ailers
+	* Sinon les aliés font la passe au milieu et le milieu aux ailers
 	*
 	*
 	*
@@ -139,6 +139,7 @@ void HighFive::assign_behavior_to_robots(
 	bool followBallMode = false; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
 	
 
+
 	//settings
 	double ballX = ball_position().x;
 	double ballY = ball_position().y;
@@ -156,6 +157,10 @@ void HighFive::assign_behavior_to_robots(
 
 	double seuilBandeau = 0.4;
 	Vision::Team ennemis = Vision::Team::Opponent;
+
+	if(ballX <= 1 && ballX >= -1){
+		followBallMode = true;
+	}
 
 	//#######   placement par défaut:   #####################################################################
 	if(!followBallMode){
@@ -234,9 +239,8 @@ void HighFive::assign_behavior_to_robots(
 		if(ballX > 1){
 			
 			//condition de zone: (bandeau 1/3)
-			if( y <= 1 && y >= -1){
+			if( y <= 1.5 && y >= -1.5){
 				//condition d'approche:
-				//if(zoneApproche.is_inside(get_robot(player_id(2)).get_movement().linear_position( time ))){
 				if(distBetween(coordM, ball_position()) <= seuilApproche){
 					
 					std::vector<int> bandeauBut = get_robot_in_line(coordM,oponent_goal_center(),ennemis,seuilBandeau);
@@ -269,10 +273,8 @@ void HighFive::assign_behavior_to_robots(
 		if(ballX > 1){
 			
 			//condition de zone: (bandeau 1/3)
-			if( y < -1){
+			if( y < -1.5){
 				//condition d'approche:
-				//if(zoneApproche.is_inside(get_robot(player_id(0)).get_movement().linear_position( time ))){
-				
 				if(distBetween(coordAD, ball_position()) <= seuilApproche){
 					std::vector<int> bandeauBut = get_robot_in_line(coordAD,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauM = get_robot_in_line(coordAD,coordM,ennemis,seuilBandeau);
@@ -298,9 +300,8 @@ void HighFive::assign_behavior_to_robots(
 		if(ballX > 1){
 			
 			//condition de zone: (bandeau 1/3)
-			if( y > 1){
+			if( y > 1.5){
 				//condition d'approche:
-				//if(zoneApproche.is_inside(get_robot(player_id(1)).get_movement().linear_position( time ))){
 				if(distBetween(coordAG, ball_position()) <= seuilApproche){
 					std::vector<int> bandeauBut = get_robot_in_line(coordAG,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauM = get_robot_in_line(coordAG,coordM,ennemis,seuilBandeau);
