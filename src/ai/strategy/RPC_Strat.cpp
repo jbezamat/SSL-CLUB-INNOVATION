@@ -24,6 +24,8 @@
 #include <robot_behavior/position_follower.h>
 #include <robot_behavior/go_to_xy.h>
 
+#define TIMER_APPROACH 50;
+
 namespace RhobanSSL {
 namespace Strategy {
 
@@ -40,8 +42,10 @@ HighFive::HighFive(Ai::AiData & ai_data):
         new Robot_behavior::Striker(ai_data)
       );
 	}
-
-
+	timerApproach = 0;
+	approachM = false;
+	approachAD = false;
+	approachAG = false;
 
 }
 	
@@ -112,7 +116,7 @@ void HighFive::assign_behavior_to_robots(
 
 	/*
 	*ATTAQUE :
-	* le milieu à un couloir de 1/3 de la hauteur(+marges de 25% de chaque côté), chaque ailier aussi.
+	* le milieu à un couloir de 1/3 de la hauteur, chaque ailier aussi.
 	* En gros si le tir est possible => striker dès qu'on atteint a balle 
 	* Sinon les aliés font la passe au milieu et le milieu aux ailers
 	*
@@ -161,6 +165,7 @@ void HighFive::assign_behavior_to_robots(
 	if(ballX <= 1 && ballX >= -1){
 		followBallMode = true;
 	}
+
 
 	//#######   placement par défaut:   #####################################################################
 	if(!followBallMode){
@@ -239,14 +244,17 @@ void HighFive::assign_behavior_to_robots(
 		if(ballX > 1){
 			
 			//condition de zone: (bandeau 1/3)
-			if( y <= 1.5 && y >= -1.5){
+			if( (y <= 1 && y >= -1 ) || approachM){
 				//condition d'approche:
-				if(distBetween(coordM, ball_position()) <= seuilApproche){
+				if(distBetween(coordM, ball_position()) <= seuilApproche && !approachAG && !approachAD){
 					
 					std::vector<int> bandeauBut = get_robot_in_line(coordM,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauAD = get_robot_in_line(coordM,coordAD,ennemis,seuilBandeau);
 					std::vector<int> bandeauAG = get_robot_in_line(coordM,coordAG,ennemis,seuilBandeau);
 					
+					if(!approachM) timerApproach = TIMER_APPROACH;
+					if(ballY<= 1 && ballY >= -1) approachM = true;
+
 					//choix de tir ou de passe à l'ailier:
 					if(bandeauBut.size() <= bandeauAD.size() && bandeauBut.size() <= bandeauAG.size()){
 						//cas de tir:
@@ -273,11 +281,14 @@ void HighFive::assign_behavior_to_robots(
 		if(ballX > 1){
 			
 			//condition de zone: (bandeau 1/3)
-			if( y < -1.5){
+			if(( y < -1 ) || approachAD){
 				//condition d'approche:
-				if(distBetween(coordAD, ball_position()) <= seuilApproche){
+				if(distBetween(coordAD, ball_position()) <= seuilApproche && !approachM && !approachAG){
 					std::vector<int> bandeauBut = get_robot_in_line(coordAD,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauM = get_robot_in_line(coordAD,coordM,ennemis,seuilBandeau);
+
+					if(!approachAD) timerApproach = TIMER_APPROACH;
+					approachAD = true;
 
 					//choix de tir ou de passe au milieu:
 					if(bandeauBut.size() <= bandeauM.size()){
@@ -297,14 +308,17 @@ void HighFive::assign_behavior_to_robots(
 		y = coordAG.y;
 
 		//condition d'attaque:
-		if(ballX > 1){
+		if( ballX > 1){
 			
 			//condition de zone: (bandeau 1/3)
-			if( y > 1.5){
+			if(( y > 1) || approachAG){
 				//condition d'approche:
-				if(distBetween(coordAG, ball_position()) <= seuilApproche){
+				if(distBetween(coordAG, ball_position()) <= seuilApproche && !approachM && !approachAD){
 					std::vector<int> bandeauBut = get_robot_in_line(coordAG,oponent_goal_center(),ennemis,seuilBandeau);
 					std::vector<int> bandeauM = get_robot_in_line(coordAG,coordM,ennemis,seuilBandeau);
+					
+					if(!approachAG) timerApproach = TIMER_APPROACH;
+					approachAG = true;
 
 					//choix de tir ou de passe au milieu:
 					if(bandeauBut.size() <= bandeauM.size()){
@@ -325,6 +339,21 @@ void HighFive::assign_behavior_to_robots(
 	//#######   comportement défensif   #####################################################################
 
 	
+
+
+
+
+
+	//#####   timers:
+	if(timerApproach > 0){
+		timerApproach--;
+	}
+	if(timerApproach == 0){
+		approachM = false;
+		approachAD = false;
+		approachAG = false;
+	}
+
 }
 
 

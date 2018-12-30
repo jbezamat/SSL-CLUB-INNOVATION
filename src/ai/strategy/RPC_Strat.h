@@ -35,6 +35,10 @@ class HighFive : public Strategy {
     std::shared_ptr<Robot_behavior::PositionFollower> position_follower;
     std::shared_ptr<Robot_behavior::GoToXY> go_to_xy[5];
     std::shared_ptr<Robot_behavior::Striker> striker[5];
+    int timerApproach;
+    bool approachM;
+    bool approachAD;
+    bool approachAG;
 
     public:
     HighFive(Ai::AiData & ai_data);
