@@ -120,13 +120,14 @@ void HighFive::assign_behavior_to_robots(
 	* En gros si le tir est possible => striker dès qu'on atteint a balle 
 	* Sinon les aliés font la passe au milieu et le milieu aux ailers
 	*
+	* Si la balle est hors de portée de M, et est sur un bandeau latéral,
+	* les attaquants peuvent reculer pour la récupérer (puis tir ou passe)
+	* 
 	*
-	*
-	*
-	*
-	*
-	*
-	*
+	* si la balle est vraiment hors de portée,
+	*	les défenseurs peuvent rapidemment avancer pour envoyer la balle
+	* au milieu ou à l'attaquant devant.
+	* 
 	*
 	*
 	*
@@ -140,16 +141,19 @@ void HighFive::assign_behavior_to_robots(
 	//4 -> defenseur gauche
 
 
-	bool followBallMode = false; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
 	
 
 
 	//settings
 	double ballX = ball_position().x;
 	double ballY = ball_position().y;
+	bool followBallMode = false; //quand == false, le 5 garde la meme hauteur et position, il suit juste BallX
+	if(ballX <= 1 && ballX >= -1){
+		followBallMode = true;
+	}
 	double d = 0;
 	if(followBallMode)
-		d = 2.5;
+		d = 1;
 	else
 		d = 2;
 
@@ -162,9 +166,7 @@ void HighFive::assign_behavior_to_robots(
 	double seuilBandeau = 0.4;
 	Vision::Team ennemis = Vision::Team::Opponent;
 
-	if(ballX <= 1 && ballX >= -1){
-		followBallMode = true;
-	}
+	
 
 
 	//#######   placement par défaut:   #####################################################################
@@ -196,8 +198,8 @@ void HighFive::assign_behavior_to_robots(
 
 
 	} else {
-		double xLimit = 4.3d;
-		double yLimit = 2.8d;
+		double xLimit = 4.3;
+		double yLimit = 2.8;
 		
 		rhoban_geometry::Point P0 = polarFromOriginToXY(ballX, ballY, +135, d);
 		go_to_xy[0] -> setX(P0.x > xLimit ? xLimit : P0.x);
@@ -233,13 +235,19 @@ void HighFive::assign_behavior_to_robots(
 	rhoban_geometry::Point coordM = get_robot(player_id(2)).get_movement().linear_position( time );
 	rhoban_geometry::Point coordAD = get_robot(player_id(0)).get_movement().linear_position( time );
 	rhoban_geometry::Point coordAG = get_robot(player_id(1)).get_movement().linear_position( time );
-
+	rhoban_geometry::Point coordDD = get_robot(player_id(3)).get_movement().linear_position( time );
+	rhoban_geometry::Point coordDG = get_robot(player_id(4)).get_movement().linear_position( time );
 
 
 	//#######   comportement offensif   #####################################################################
-		
+		double distAttDefD = coordAD.x - coordDD.x;
+		if(distAttDefD < 0) distAttDefD = 0;
+		double distAttDefG = coordAG.x - coordDG.x;
+		if(distAttDefG < 0) distAttDefG = 0;
+
 		//=====>   millieu:
 		double y = coordM.y;
+		double x, deltaX;
 		//condition d'attaque:
 		if(ballX > 1){
 			
@@ -334,8 +342,51 @@ void HighFive::assign_behavior_to_robots(
 
 		}
 
-		
 
+	//=====>   défenseur droit:		
+
+	y = coordDD.y;
+	x = coordDD.x;
+	deltaX = abs(x - ballX);
+	//condition d'attaque:
+	if(ballX > 1){
+		//condition de bandeau et d'approche:
+		if(ballY < -1 && !approachM && !approachAD && deltaX < 0.5*distAttDefD){
+
+			std::vector<int> bandeauA = get_robot_in_line(coordDD,coordAD,ennemis,seuilBandeau);
+			std::vector<int> bandeauM = get_robot_in_line(coordDD,coordM,ennemis,seuilBandeau);
+			if(bandeauA.size() <= bandeauM.size()){
+				striker[3] ->  declare_point_to_strik(coordAD);
+			}else{
+				striker[3] ->  declare_point_to_strik(coordM);
+			}
+			assign_behavior (player_id(3), striker[3]);
+		}
+	}
+
+	//=====>   défenseur gauche:
+
+	y = coordDG.y;
+	x = coordDG.x;
+	deltaX = abs(x - ballX);
+	//condition d'attaque:
+	if(ballX > 1){
+		//condition de bandeau et d'approche:
+		if(ballY > 1 && !approachM && !approachAG && deltaX < 0.5*distAttDefG){
+			
+			std::vector<int> bandeauA = get_robot_in_line(coordDG,coordAG,ennemis,seuilBandeau);
+			std::vector<int> bandeauM = get_robot_in_line(coordDG,coordM,ennemis,seuilBandeau);
+			if(bandeauA.size() <= bandeauM.size()){
+				striker[4] ->  declare_point_to_strik(coordAG);
+			}else{
+				striker[4] ->  declare_point_to_strik(coordM);
+			}
+			assign_behavior (player_id(4), striker[4]);
+			
+		}
+	}
+
+	
 	//#######   comportement défensif   #####################################################################
 
 	
