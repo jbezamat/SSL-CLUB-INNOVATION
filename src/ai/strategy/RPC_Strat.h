@@ -25,6 +25,7 @@
 #include <robot_behavior/go_to_xy.h>
 #include <robot_behavior/striker.h>
 #include <robot_behavior/degageur.h>
+#include <robot_behavior/mur_defensor.h>
 #include "game_informations.h"
 
 namespace RhobanSSL {
@@ -37,6 +38,7 @@ class HighFive : public Strategy {
     std::shared_ptr<Robot_behavior::GoToXY> go_to_xy[5];
     std::shared_ptr<Robot_behavior::Striker> striker[5];
     std::shared_ptr<Robot_behavior::Degageur> degageur[5];
+    std::shared_ptr<Robot_behavior::Mur_defensor> mur[5];
     int timerApproach;
     bool approachM;
     bool approachAD;

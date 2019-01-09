@@ -254,14 +254,14 @@ void RPCManager::start_stop(){
 
 void RPCManager::start_running(){
     set_ball_avoidance_for_all_robots(false);
-
+/*
     if(ball_position().x < -1 && ball_was_in_offensive_zone){
         future_strats = defensive_strats[Manager::get_valid_player_ids().size() + 1];
         ball_was_in_offensive_zone = false;
-    }else if(ball_position().x >= -1 && not(ball_was_in_offensive_zone)){
+    }else if(ball_position().x >= -1 && not(ball_was_in_offensive_zone)){*/
         future_strats = {Strategy::GoalieStrat::name, Strategy::HighFive::name};
-        ball_was_in_offensive_zone = true;
-    }
+       // ball_was_in_offensive_zone = true;
+    //}
 
     declare_and_assign_next_strategies(future_strats);
 }
@@ -303,7 +303,7 @@ void RPCManager::continue_stop(){
 }
 
 void RPCManager::continue_running(){
-    if(ball_position().x < -1 && ball_was_in_offensive_zone){
+    /*if(ball_position().x < -1 && ball_was_in_offensive_zone){
         clear_strategy_assignement();
         future_strats = defensive_strats[Manager::get_valid_player_ids().size() + 1];
         ball_was_in_offensive_zone = false;
@@ -313,7 +313,7 @@ void RPCManager::continue_running(){
         future_strats = {Strategy::GoalieStrat::name, Strategy::HighFive::name};
         ball_was_in_offensive_zone = true;
         declare_and_assign_next_strategies(future_strats);
-    }
+    }*/
 
     
 }

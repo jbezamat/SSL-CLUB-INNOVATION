@@ -45,6 +45,9 @@ HighFive::HighFive(Ai::AiData & ai_data):
 	  degageur[i] = std::shared_ptr<Robot_behavior::Degageur>(
         new Robot_behavior::Degageur(ai_data)
       );
+	  mur[i] = std::shared_ptr<Robot_behavior::Mur_defensor>(
+        new Robot_behavior::Mur_defensor(ai_data)
+      );
 	}
 	timerApproach = 0;
 	approachM = false;
@@ -452,8 +455,19 @@ void HighFive::assign_behavior_to_robots(
 
 	
 	//#######   comportement défensif   #####################################################################
-
 	
+	//défenseur droit :
+	if(ballX < -1){
+		assign_behavior (player_id(3), mur[3]);
+	}
+
+
+	//défenseur gauche :
+	if(ballX < -1){
+		assign_behavior (player_id(4), mur[4]);
+	}
+
+
 
 
 
