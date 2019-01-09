@@ -25,6 +25,7 @@
 #include <robot_behavior/go_to_xy.h>
 
 #define TIMER_APPROACH 50;
+#define TIMER_MIDDLE 200;
 
 namespace RhobanSSL {
 namespace Strategy {
@@ -41,12 +42,19 @@ HighFive::HighFive(Ai::AiData & ai_data):
 	  striker[i] = std::shared_ptr<Robot_behavior::Striker>(
         new Robot_behavior::Striker(ai_data)
       );
+	  degageur[i] = std::shared_ptr<Robot_behavior::Degageur>(
+        new Robot_behavior::Degageur(ai_data)
+      );
 	}
 	timerApproach = 0;
 	approachM = false;
 	approachAD = false;
 	approachAG = false;
-
+	timerMiddle = 0;
+	for(size_t i = 0; i < 5; i++)
+	{
+		middle[i] = false;
+	}
 }
 	
 	 
@@ -128,8 +136,10 @@ void HighFive::assign_behavior_to_robots(
 	*	les défenseurs peuvent rapidemment avancer pour envoyer la balle
 	* au milieu ou à l'attaquant devant.
 	* 
-	*
-	*
+	* MILIEU :
+	* Au milieu on passe en mode followballMode très rapproché, quand un des robots atteint la balle,
+	* il peut la dégager vers l'attaque.
+	* Un booleen timer doit empecher que tous se jettent dessus, priorité au milieu. 
 	*
 	*/
 
@@ -386,6 +396,60 @@ void HighFive::assign_behavior_to_robots(
 		}
 	}
 
+	//#######   comportement milieu   #####################################################################
+
+	//followballmode est actif
+	if(ballX <= 1 && ballX >= -1){
+		
+		if((distBetween(coordM, ball_position()) <= seuilApproche && timerMiddle == 0) || middle[2]) {
+			//striker[2] ->  declare_point_to_strik(oponent_goal_center());
+			assign_behavior (player_id(2), degageur[2]);
+			if(timerMiddle == 0){
+				timerMiddle = TIMER_MIDDLE;
+				middle[2] = true;
+			} 
+		}
+		
+		if((distBetween(coordAD, ball_position()) <= seuilApproche && timerMiddle == 0) || middle[0]) {
+			//striker[0] ->  declare_point_to_strik(oponent_goal_center());
+			assign_behavior (player_id(0), degageur[0]);
+			if(timerMiddle == 0){
+				timerMiddle = TIMER_MIDDLE;
+				middle[0] = true;
+			} 
+		}
+		if((distBetween(coordAG, ball_position()) <= seuilApproche && timerMiddle == 0) || middle[1]) {
+			//striker[1] ->  declare_point_to_strik(oponent_goal_center());
+			assign_behavior (player_id(1), degageur[1]);
+			if(timerMiddle == 0){
+				timerMiddle = TIMER_MIDDLE;
+				middle[1] = true;
+			} 
+		}
+		
+		if((distBetween(coordDD, ball_position()) <= seuilApproche && timerMiddle == 0) || middle[3]) {
+			//striker[3] ->  declare_point_to_strik(oponent_goal_center());
+			assign_behavior (player_id(3), degageur[3]);
+			if(timerMiddle == 0){
+				timerMiddle = TIMER_MIDDLE;
+				middle[3] = true;
+			} 
+		}
+		if((distBetween(coordDG, ball_position()) <= seuilApproche && timerMiddle == 0) || middle[4]) {
+			//striker[4] ->  declare_point_to_strik(oponent_goal_center());
+			assign_behavior (player_id(4), degageur[4]);
+			if(timerMiddle == 0){
+				timerMiddle = TIMER_MIDDLE;
+				middle[4] = true;
+			} 
+		}
+
+	}
+
+
+
+
+
 	
 	//#######   comportement défensif   #####################################################################
 
@@ -405,6 +469,14 @@ void HighFive::assign_behavior_to_robots(
 		approachAG = false;
 	}
 
+	if(timerMiddle > 0){
+		timerMiddle--;
+		if(timerMiddle == 0){
+			for(int i =0; i < 5; i++){
+				middle[i] = false;
+			}
+		}
+	}
 }
 
 
