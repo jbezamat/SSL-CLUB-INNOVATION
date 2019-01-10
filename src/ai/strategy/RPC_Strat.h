@@ -45,6 +45,9 @@ class HighFive : public Strategy {
     bool approachAG;
     int timerMiddle;
     bool middle[5];
+    bool degMurD;
+    bool degMurG;
+    int timerMur;
 
     public:
     HighFive(Ai::AiData & ai_data);

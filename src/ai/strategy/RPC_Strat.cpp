@@ -26,6 +26,7 @@
 
 #define TIMER_APPROACH 50;
 #define TIMER_MIDDLE 200;
+#define TIMER_MUR 100;
 
 namespace RhobanSSL {
 namespace Strategy {
@@ -58,6 +59,8 @@ HighFive::HighFive(Ai::AiData & ai_data):
 	{
 		middle[i] = false;
 	}
+	degMurD = false;
+	degMurG = false;
 }
 	
 	 
@@ -455,16 +458,28 @@ void HighFive::assign_behavior_to_robots(
 
 	
 	//#######   comportement défensif   #####################################################################
-	
+	double seuil = 0.5;
 	//défenseur droit :
 	if(ballX < -1){
 		assign_behavior (player_id(3), mur[3]);
+		if((distBetween(coordDD, ball_position()) <= seuil  && timerMur == 0 )|| degMurD){
+			assign_behavior (player_id(3), degageur[3]);
+			degMurD = true;
+			if(timerMur == 0) timerMur = TIMER_MUR;
+			DEBUG("------------3   "<<timerMur);
+		}
 	}
 
 
 	//défenseur gauche :
 	if(ballX < -1){
 		assign_behavior (player_id(4), mur[4]);
+		if((distBetween(coordDG, ball_position()) <= seuil  && timerMur == 0 )|| degMurG){
+			assign_behavior (player_id(4), degageur[4]);
+			degMurG = true;
+			if(timerMur == 0) timerMur = TIMER_MUR;
+			DEBUG("------------4  "<<timerMur);
+		}
 	}
 
 
@@ -491,6 +506,16 @@ void HighFive::assign_behavior_to_robots(
 			}
 		}
 	}
+
+
+	if(timerMur > 0){
+		timerMur--;
+		if(timerMur == 0){
+			degMurD = false;
+			degMurG = false;
+		}
+	}
+
 }
 
 
