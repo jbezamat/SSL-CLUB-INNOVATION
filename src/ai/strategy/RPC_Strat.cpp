@@ -27,6 +27,7 @@
 #define TIMER_APPROACH 50;
 #define TIMER_MIDDLE 200;
 #define TIMER_MUR 100;
+#define TIMER_DEF 100;
 
 namespace RhobanSSL {
 namespace Strategy {
@@ -61,6 +62,11 @@ HighFive::HighFive(Ai::AiData & ai_data):
 	}
 	degMurD = false;
 	degMurG = false;
+	timerMur = 0;
+	degDefM = false;
+	degDefAD = false;
+	degDefAG = false;
+	timerDef = 0;
 }
 	
 	 
@@ -147,6 +153,8 @@ void HighFive::assign_behavior_to_robots(
 	* il peut la dégager vers l'attaque.
 	* Un booleen timer doit empecher que tous se jettent dessus, priorité au milieu. 
 	*
+	*	DEFENSE: 
+	*   2 murs dégaeurs et 3 dégaeurs, avec tout le couloir latéral  gérer pour les attaquants
 	*/
 
 
@@ -173,10 +181,10 @@ void HighFive::assign_behavior_to_robots(
 	else
 		d = 2;
 
-	double cote = 1.20;//0.80;
-	Box zoneApproche = Box(
+	//double cote = 1.20;//0.80;
+	/*Box zoneApproche = Box(
                     {ballX - cote, ballY - cote},
-                     {ballX + cote, ballY + cote});
+                     {ballX + cote, ballY + cote});*/
 	double seuilApproche = 1.50;
 
 	double seuilBandeau = 0.4;
@@ -458,15 +466,15 @@ void HighFive::assign_behavior_to_robots(
 
 	
 	//#######   comportement défensif   #####################################################################
+	
 	double seuil = 0.5;
 	//défenseur droit :
 	if(ballX < -1){
 		assign_behavior (player_id(3), mur[3]);
-		if((distBetween(coordDD, ball_position()) <= seuil  && timerMur == 0 )|| degMurD){
+		if(((distBetween(coordDD, ball_position()) <= seuil  && timerMur == 0 )|| degMurD) &&(!degDefAG && !degDefAD && !degDefM)){
 			assign_behavior (player_id(3), degageur[3]);
 			degMurD = true;
 			if(timerMur == 0) timerMur = TIMER_MUR;
-			DEBUG("------------3   "<<timerMur);
 		}
 	}
 
@@ -474,18 +482,43 @@ void HighFive::assign_behavior_to_robots(
 	//défenseur gauche :
 	if(ballX < -1){
 		assign_behavior (player_id(4), mur[4]);
-		if((distBetween(coordDG, ball_position()) <= seuil  && timerMur == 0 )|| degMurG){
+		if(((distBetween(coordDG, ball_position()) <= seuil  && timerMur == 0 )|| degMurG) &&(!degDefAG && !degDefAD && !degDefM)){
 			assign_behavior (player_id(4), degageur[4]);
 			degMurG = true;
 			if(timerMur == 0) timerMur = TIMER_MUR;
-			DEBUG("------------4  "<<timerMur);
+		}
+	}
+	
+
+
+	
+	//milieu:
+	if(ballX < - 1){
+		if((( distBetween(coordM, ball_position()) <= seuilApproche && timerDef == 0) || degDefM)&&(!degMurG && !degMurD)){
+			assign_behavior (player_id(2), degageur[2]);
+			degDefM = true;
+			if(timerDef == 0) timerDef = TIMER_DEF;
 		}
 	}
 
+	//attaquant droite:
+	if(ballX < - 1){
+		if((( ballY < -1 && timerDef == 0) || degDefAD)&&(!degMurG && !degMurD)){
+			assign_behavior (player_id(0), degageur[0]);
+			degDefAD = true;
+			if(timerDef == 0) timerDef = TIMER_DEF;
+		}
+	}
 
-
-
-
+	//attaquant gauche:
+	if(ballX < - 1){
+		if((( ballY > 1 && timerDef == 0) || degDefAG)&&(!degMurG && !degMurD)){
+			assign_behavior (player_id(1), degageur[1]);
+			degDefAG = true;
+			if(timerDef == 0) timerDef = TIMER_DEF;
+		}
+	}
+	
 
 
 	//#####   timers:
@@ -513,6 +546,15 @@ void HighFive::assign_behavior_to_robots(
 		if(timerMur == 0){
 			degMurD = false;
 			degMurG = false;
+		}
+	}
+
+	if(timerDef > 0){
+		timerDef--;
+		if(timerDef == 0){
+			degDefM = false;
+			degDefAD = false;
+			degDefAG = false;
 		}
 	}
 
